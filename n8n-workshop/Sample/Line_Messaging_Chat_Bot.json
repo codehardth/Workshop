@@ -1,0 +1,542 @@
+{
+  "name": "Line Messaging Chat Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('Webhook from Line Messaging API').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.output }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "cba3900f-93ae-43f9-af2b-150b6a956b12",
+      "name": "Line : Reply with token",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1396,
+        300
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YfMDbuvSDAc89lE1",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "b63773bb-f010-4018-8142-240c9aaa4570",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.body.events[0].type }}",
+              "rightValue": "message"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5884916d-f095-4df6-8322-726d8c710d9d",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -520,
+        150
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": "qwen3:14b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        8,
+        520
+      ],
+      "id": "6383159a-fb5e-411c-b3c8-71db4cdb15d9",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "kGcH2MwM2gSteUy8",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook from Line Messaging API').item.json.body.events[0].message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You're a gentleman assistant named \"รุ่ยเจี๋ย\"\n\nYou are a highly skilled software engineer and ready to help user achieve anything they asked.\n\nToday is {{ $now.toLocal().format('yyyy-MM-dd') }}\n\nYou must always use a \"search\" tool no matter if you are sure or not about your answer, it's a responsible thing to get the most up to date information for user.\n\nYou must check how to use the search tool by looking at the \"List Available Tools\".\n\nEnsure that all your responses are in Thai language."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        548,
+        300
+      ],
+      "id": "3cc669ea-11a6-473e-b8d4-9ad86eb10b66",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const output = $json.output.replace(/<think>[\\s\\S]*?<\\/think>/g, '').trim();\n\n$json.output = output;\n\nreturn $json;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        956,
+        300
+      ],
+      "id": "b8d87663-7619-4400-9a16-96f7384e93fc",
+      "name": "Remove <think> block"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook from Line Messaging API').item.json.body.events[0].source.userId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        516,
+        520
+      ],
+      "id": "08ef8648-a331-4aac-826d-61fbfd93d73a",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "lQXJcrElclqkizga",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $json.output\n  .replace(/[\\u0000-\\u0009\\u000B-\\u001F\\u007F]/g, \"\")\n  .replace(/\"/g, \"'\")\n  .replace(/\\n/g, '\\\\n')\n  .trim();\n$json.output = output;\n\nreturn $json;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1176,
+        300
+      ],
+      "id": "5c228100-9c90-428d-99de-c4fd9a3c31b5",
+      "name": "Sanitize output string"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM public.n8n_chat_histories\nWHERE session_id='{{ $('Webhook from Line Messaging API').item.json.body.events[0].source.userId }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2,
+        0
+      ],
+      "id": "68b67ab6-ab90-4041-b536-2e40e7c1cb58",
+      "name": "Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "lQXJcrElclqkizga",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook from Line Messaging API').item.json.body.events[0].message.text }}",
+                    "rightValue": "/reset",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "aa8dc75e-c849-4216-8ab9-544c1be69260"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "/reset command"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "72692753-38f4-460c-926e-17cc28928ffe",
+                    "leftValue": "={{ $('Webhook from Line Messaging API').item.json.body.events[0].message.text }}",
+                    "rightValue": "=/reset",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notStartsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Normal conversation"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 1
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -300,
+        150
+      ],
+      "id": "84c883aa-1b9a-4cf2-bc5b-8de3854f87af",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('Webhook from Line Messaging API').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"Chat history reset\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "4f22b8c4-0cfc-4636-ac7c-36750d211f9e",
+      "name": "Line: Reset Respond",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        296,
+        0
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YfMDbuvSDAc89lE1",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+        "options": {}
+      },
+      "id": "82fb2fb4-c6af-44c6-b69c-8467088eaf19",
+      "name": "Webhook from Line Messaging API",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -740,
+        150
+      ],
+      "webhookId": "638c118e-1c98-4491-b6ff-14e2e75380b6",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "search",
+        "toolParameters": "={\n   \"query\": \"{{ $('think_removal_from_search_keyword').item.json.output }}\"\n}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        636,
+        520
+      ],
+      "id": "d6814cc7-738b-4f9c-a011-7e25b303b2db",
+      "name": "Call search tool",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "NgaxVB1bb7ODEXsh",
+          "name": "duckduckgo"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        756,
+        520
+      ],
+      "id": "3c383be6-5e8d-4f55-987d-8084660d5342",
+      "name": "List available tools",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "NgaxVB1bb7ODEXsh",
+          "name": "duckduckgo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Convert the following query into an appropriate search keyword\n\n```\n{{ $('Webhook from Line Messaging API').item.json.body.events[0].message.text }}\n```\n\nYou must only answer with the search keyword and nothing else.\n\n/no_think",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        300
+      ],
+      "id": "a5c6056d-a382-4971-b827-084204a6265d",
+      "name": "Generate relevant search keyword"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const output = $json.output\n  .replace(/<think>[\\s\\S]*?<\\/think>/g, '')\n  .replace(/\"/g, \"\")\n  .trim();\n\n$json.output = output;\n\nreturn $json;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        296,
+        300
+      ],
+      "id": "2fe8d10d-b169-4515-a0c2-83bc8855271a",
+      "name": "think_removal_from_search_keyword"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        660
+      ],
+      "id": "b778851f-5550-4ae7-b45c-667799d1c80f",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "fio4mh5NIgwhEXkN",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate relevant search keyword",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Remove <think> block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove <think> block": {
+      "main": [
+        [
+          {
+            "node": "Sanitize output string",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitize output string": {
+      "main": [
+        [
+          {
+            "node": "Line : Reply with token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Line: Reset Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate relevant search keyword",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook from Line Messaging API": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call search tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List available tools": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate relevant search keyword": {
+      "main": [
+        [
+          {
+            "node": "think_removal_from_search_keyword",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "think_removal_from_search_keyword": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f3594cd0-f8cb-4d64-99ec-0cdf2534d5fa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc41a5e416b4da7a7755359c081e77884fbf538c26dd41be41c0c030b921fb0b"
+  },
+  "id": "NCM9kaCQNml9NAdb",
+  "tags": []
+}
