@@ -1,0 +1,220 @@
+{
+  "name": "Building Blocks",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        -20
+      ],
+      "id": "9aeda170-5853-4d50-a00b-666b8f310950",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2f43be0a-aff6-4b48-bfab-57f3d973ed6d",
+              "leftValue": "={{ $('Get a Google webpage').item.json.data }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        180,
+        -20
+      ],
+      "id": "b889d9e3-ff53-46cb-b10e-8e73045df539",
+      "name": "Data is not empty?"
+    },
+    {
+      "parameters": {
+        "url": "http://www.google.com",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -60,
+        -20
+      ],
+      "id": "e34bb935-1efa-466d-bac1-df7a12976b64",
+      "name": "Get a Google webpage"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// An example of a node variable to retrieve value \n// from 'Get a Google webpage' node\nconst output = $('Get a Google webpage').item;\nconsole.log(output);\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        -40
+      ],
+      "id": "4a3fde08-cfbc-467b-9b96-38d4024926fe",
+      "name": "Log before return the data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  data: undefined\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        100
+      ],
+      "id": "a62a7d91-d8f6-4af3-982d-00c52b21a26f",
+      "name": "Return fallback output"
+    },
+    {
+      "parameters": {
+        "content": "## Actions\nPerform tasks (e.g., send email, call API, update DB)",
+        "height": 380,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        -140
+      ],
+      "id": "6ac12867-d837-4320-957c-b1facbf46e43",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Code\nUses a custom code for data manipulation",
+        "height": 380,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -140
+      ],
+      "id": "9f0c4e36-9b23-4335-aa61-a3a251f777fd",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Logic\nPerform a logical condition (eg., if, switch)",
+        "height": 380,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        -140
+      ],
+      "id": "d4018b80-def1-481d-b330-d21ff1c4f3ec",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Trigger\nStart workflows (e.g., Webhook, Cron, App events)",
+        "height": 380,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        -140
+      ],
+      "id": "d9c5b28d-e24f-4b0f-98e0-2baf1d642916",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Workflow\nA combination of nodes composed together to make a useful workflow",
+        "height": 520,
+        "width": 1160,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -460,
+        -240
+      ],
+      "id": "4d3bc9fc-e37c-49b4-9cc7-4d647f3075d1",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a Google webpage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a Google webpage": {
+      "main": [
+        [
+          {
+            "node": "Data is not empty?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data is not empty?": {
+      "main": [
+        [
+          {
+            "node": "Log before return the data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return fallback output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fd9455a7-c6d9-4776-80b4-f219425c1048",
+  "meta": {
+    "instanceId": "dc41a5e416b4da7a7755359c081e77884fbf538c26dd41be41c0c030b921fb0b"
+  },
+  "id": "8vkQI59Zuq2u7x6R",
+  "tags": []
+}
