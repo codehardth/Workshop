@@ -628,8 +628,8 @@ public class EvaluatorTests
     public void Evaluate_Complex_LongChain()
     {
         // 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 = 55
-        Expression expr = Num(1);
-        for (int i = 2; i <= 10; i++)
+        var expr = Num(1);
+        for (var i = 2; i <= 10; i++)
         {
             expr = Binary(expr, TokenType.Plus, Num(i));
         }

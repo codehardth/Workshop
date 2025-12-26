@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Z7uwXOXsoco=",
+  "dgSpecHash": "6RHD0M1zCog=",
   "success": true,
   "projectFilePath": "/home/deszolate/Documents/Work/Workshop/claude-code-workflow/handson/test-driven/Calculator.Tests/Calculator.Tests.csproj",
   "expectedPackageFiles": [
@@ -18,7 +18,9 @@
     "/home/deszolate/.nuget/packages/xunit.core/2.9.2/xunit.core.2.9.2.nupkg.sha512",
     "/home/deszolate/.nuget/packages/xunit.extensibility.core/2.9.2/xunit.extensibility.core.2.9.2.nupkg.sha512",
     "/home/deszolate/.nuget/packages/xunit.extensibility.execution/2.9.2/xunit.extensibility.execution.2.9.2.nupkg.sha512",
-    "/home/deszolate/.nuget/packages/xunit.runner.visualstudio/2.8.2/xunit.runner.visualstudio.2.8.2.nupkg.sha512"
+    "/home/deszolate/.nuget/packages/xunit.runner.visualstudio/2.8.2/xunit.runner.visualstudio.2.8.2.nupkg.sha512",
+    "/home/deszolate/.nuget/packages/microsoft.netcore.app.ref/9.0.11/microsoft.netcore.app.ref.9.0.11.nupkg.sha512",
+    "/home/deszolate/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.11/microsoft.aspnetcore.app.ref.9.0.11.nupkg.sha512"
   ],
   "logs": []
 }

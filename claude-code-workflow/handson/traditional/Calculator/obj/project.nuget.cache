@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "w0bSIu2kMww=",
+  "dgSpecHash": "DbWvDW8PRic=",
   "success": true,
   "projectFilePath": "/home/deszolate/Documents/Work/Workshop/claude-code-workflow/handson/traditional/Calculator/Calculator.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/deszolate/.nuget/packages/microsoft.netcore.app.ref/9.0.11/microsoft.netcore.app.ref.9.0.11.nupkg.sha512",
+    "/home/deszolate/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.11/microsoft.aspnetcore.app.ref.9.0.11.nupkg.sha512"
+  ],
   "logs": []
 }

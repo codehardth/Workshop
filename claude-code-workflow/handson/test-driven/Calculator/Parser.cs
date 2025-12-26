@@ -154,7 +154,7 @@ public class Parser
         // Parenthesized expression
         if (Match(TokenType.LeftParen))
         {
-            int openParenPosition = Previous().Position;
+            var openParenPosition = Previous().Position;
 
             // Check for empty parentheses
             if (Check(TokenType.RightParen))

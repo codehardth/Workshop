@@ -56,7 +56,7 @@ public class ParserTests
         var list = tokens.ToList();
         if (list.Count == 0 || list[^1].Type != TokenType.EndOfInput)
         {
-            int position = list.Count > 0 ? list[^1].Position + list[^1].Lexeme.Length : 0;
+            var position = list.Count > 0 ? list[^1].Position + list[^1].Lexeme.Length : 0;
             list.Add(new Token(TokenType.EndOfInput, "", position));
         }
         return list;

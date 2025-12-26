@@ -33,7 +33,7 @@ class Program
         while (true)
         {
             Console.Write("> ");
-            string? input = Console.ReadLine();
+            var input = Console.ReadLine();
 
             // Handle null input (Ctrl+D / end of stream)
             if (input == null)
@@ -52,7 +52,7 @@ class Program
             }
 
             // Handle commands
-            string lowerInput = input.ToLowerInvariant();
+            var lowerInput = input.ToLowerInvariant();
 
             if (lowerInput == "exit")
             {
@@ -93,7 +93,7 @@ class Program
     /// Pipeline: tokenize -> parse -> evaluate -> display
     /// Uses the Result.Bind method for clean chaining.
     /// </summary>
-    static void EvaluateAndPrint(string input)
+    private static void EvaluateAndPrint(string input)
     {
         // Chain: Tokenize -> Parse -> Evaluate
         var result =
@@ -105,7 +105,7 @@ class Program
             value =>
             {
                 // Format the output: show integer for whole numbers, otherwise show decimal
-                if (value == Math.Floor(value) && !double.IsInfinity(value) && Math.Abs(value) < 1e15)
+                if (value.Equals(Math.Floor(value)) && !double.IsInfinity(value) && Math.Abs(value) < 1e15)
                 {
                     Console.WriteLine((long)value);
                 }

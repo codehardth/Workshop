@@ -64,8 +64,8 @@ public class Lexer
     /// </summary>
     private Result<Token> ScanToken()
     {
-        char c = Peek();
-        int startPosition = _position;
+        var c = Peek();
+        var startPosition = _position;
 
         // Single-character tokens
         switch (c)
@@ -105,7 +105,7 @@ public class Lexer
     /// </summary>
     private Result<Token> ScanNumber()
     {
-        int startPosition = _position;
+        var startPosition = _position;
 
         // Consume integer part
         while (!IsAtEnd() && char.IsDigit(Peek()))
@@ -126,7 +126,7 @@ public class Lexer
             }
         }
 
-        string lexeme = _source.Substring(startPosition, _position - startPosition);
+        var lexeme = _source.Substring(startPosition, _position - startPosition);
 
         // Validate the number can be parsed
         if (double.TryParse(lexeme, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
