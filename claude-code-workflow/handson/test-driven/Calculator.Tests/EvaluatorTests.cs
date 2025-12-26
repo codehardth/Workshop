@@ -2,6 +2,8 @@ using Calculator;
 
 namespace Calculator.Tests;
 
+using Moq;
+
 /// <summary>
 /// Comprehensive unit tests for the Evaluator class.
 /// Tests are organized by category: basic operations, operator precedence,
@@ -60,8 +62,17 @@ public class EvaluatorTests
     public void Evaluate_Addition_2Plus3Equals5()
     {
         // 2 + 3 = 5
-        var expr = Binary(Num(2), TokenType.Plus, Num(3));
+
+        // Arrange
+        var expr = Binary(
+            Num(2),
+            TokenType.Plus,
+            Num(3));
+
+        // Act
         var result = Evaluator.Evaluate(expr);
+
+        // Assert
         AssertSuccess(result, 5.0);
     }
 
@@ -93,10 +104,10 @@ public class EvaluatorTests
     }
 
     [Theory]
-    [InlineData(0, 5, 5)]       // 0 + 5 = 5
-    [InlineData(5, 0, 5)]       // 5 + 0 = 5
-    [InlineData(-2, -3, -5)]    // -2 + -3 = -5
-    [InlineData(-5, 10, 5)]     // -5 + 10 = 5
+    [InlineData(0, 5, 5)] // 0 + 5 = 5
+    [InlineData(5, 0, 5)] // 5 + 0 = 5
+    [InlineData(-2, -3, -5)] // -2 + -3 = -5
+    [InlineData(-5, 10, 5)] // -5 + 10 = 5
     [InlineData(100, 200, 300)] // 100 + 200 = 300
     public void Evaluate_Addition_VariousOperands(double a, double b, double expected)
     {
@@ -106,11 +117,11 @@ public class EvaluatorTests
     }
 
     [Theory]
-    [InlineData(5, 5, 0)]       // 5 - 5 = 0
-    [InlineData(3, 5, -2)]      // 3 - 5 = -2
-    [InlineData(-5, -3, -2)]    // -5 - (-3) = -2
-    [InlineData(0, 5, -5)]      // 0 - 5 = -5
-    [InlineData(100, 30, 70)]   // 100 - 30 = 70
+    [InlineData(5, 5, 0)] // 5 - 5 = 0
+    [InlineData(3, 5, -2)] // 3 - 5 = -2
+    [InlineData(-5, -3, -2)] // -5 - (-3) = -2
+    [InlineData(0, 5, -5)] // 0 - 5 = -5
+    [InlineData(100, 30, 70)] // 100 - 30 = 70
     public void Evaluate_Subtraction_VariousOperands(double a, double b, double expected)
     {
         var expr = Binary(Num(a), TokenType.Minus, Num(b));
@@ -119,12 +130,12 @@ public class EvaluatorTests
     }
 
     [Theory]
-    [InlineData(5, 0, 0)]       // 5 * 0 = 0
-    [InlineData(0, 5, 0)]       // 0 * 5 = 0
-    [InlineData(42, 1, 42)]     // 42 * 1 = 42
-    [InlineData(-3, -4, 12)]    // -3 * -4 = 12
-    [InlineData(-2, 5, -10)]    // -2 * 5 = -10
-    [InlineData(7, 8, 56)]      // 7 * 8 = 56
+    [InlineData(5, 0, 0)] // 5 * 0 = 0
+    [InlineData(0, 5, 0)] // 0 * 5 = 0
+    [InlineData(42, 1, 42)] // 42 * 1 = 42
+    [InlineData(-3, -4, 12)] // -3 * -4 = 12
+    [InlineData(-2, 5, -10)] // -2 * 5 = -10
+    [InlineData(7, 8, 56)] // 7 * 8 = 56
     public void Evaluate_Multiplication_VariousOperands(double a, double b, double expected)
     {
         var expr = Binary(Num(a), TokenType.Star, Num(b));
@@ -133,12 +144,12 @@ public class EvaluatorTests
     }
 
     [Theory]
-    [InlineData(10, 2, 5)]      // 10 / 2 = 5
-    [InlineData(0, 5, 0)]       // 0 / 5 = 0
-    [InlineData(42, 1, 42)]     // 42 / 1 = 42
-    [InlineData(-12, -4, 3)]    // -12 / -4 = 3
-    [InlineData(-10, 2, -5)]    // -10 / 2 = -5
-    [InlineData(100, 4, 25)]    // 100 / 4 = 25
+    [InlineData(10, 2, 5)] // 10 / 2 = 5
+    [InlineData(0, 5, 0)] // 0 / 5 = 0
+    [InlineData(42, 1, 42)] // 42 / 1 = 42
+    [InlineData(-12, -4, 3)] // -12 / -4 = 3
+    [InlineData(-10, 2, -5)] // -10 / 2 = -5
+    [InlineData(100, 4, 25)] // 100 / 4 = 25
     public void Evaluate_Division_VariousOperands(double a, double b, double expected)
     {
         var expr = Binary(Num(a), TokenType.Slash, Num(b));
@@ -546,12 +557,12 @@ public class EvaluatorTests
     [Theory]
     [InlineData(1, 3, 0.333333333333333)]
     [InlineData(2, 3, 0.666666666666667)]
-    [InlineData(22, 7, 3.14285714285714)]  // Pi approximation
+    [InlineData(22, 7, 3.14285714285714)] // Pi approximation
     public void Evaluate_FloatingPoint_RepeatingDecimals(double a, double b, double expected)
     {
         var expr = Binary(Num(a), TokenType.Slash, Num(b));
         var result = Evaluator.Evaluate(expr);
-        AssertSuccess(result, expected, precision: 5);  // Lower precision for repeating decimals
+        AssertSuccess(result, expected, precision: 5); // Lower precision for repeating decimals
     }
 
     #endregion
@@ -629,6 +640,7 @@ public class EvaluatorTests
     {
         // 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 = 55
         var expr = Num(1);
+
         for (var i = 2; i <= 10; i++)
         {
             expr = Binary(expr, TokenType.Plus, Num(i));
@@ -804,6 +816,48 @@ public class EvaluatorTests
         var expr = Binary(Num(1e-6), TokenType.Star, Num(1e-6));
         var result = Evaluator.Evaluate(expr);
         AssertSuccess(result, 1e-12);
+    }
+
+    #endregion
+
+    #region Special Cases
+
+    [Theory]
+    [InlineData(10, 15)]
+    [InlineData(15, 10)]
+    [InlineData(-10, -15)]
+    public void Evaluate_WhenSubtract_MustBeGreaterOrEqualToZero(int a, int b)
+    {
+        // Arrange
+        var expr = Binary(Num(a), TokenType.Minus, Num(b));
+
+        // Act
+        var result = Evaluator.Evaluate(expr);
+
+        // Assert
+        Assert.True(result.Match(r => r, r => -1) >= 0);
+    }
+
+    [Theory]
+    [InlineData(100, 12)]
+    [InlineData(100, 10)]
+    [InlineData(100, 1)]
+    public void Evaluate_WhenMultiply_MustNotOverOneThousand(int a, int b)
+    {
+        // Arrange
+        var mutatedB = SideEffectValue(b);
+        var expr = Binary(Num(a), TokenType.Star, Num(mutatedB));
+
+        // Act
+        var result = Evaluator.Evaluate(expr);
+
+        // Assert
+        Assert.True(result.Map(r => r <= 1000).Match(r => r, r => false));
+    }
+
+    public static int SideEffectValue(int x)
+    {
+        return x + 1;
     }
 
     #endregion
